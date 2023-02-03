@@ -18,11 +18,14 @@ import TheVideos from "./components/TheVideos.vue";
 export default {
   name: "App",
   components: {
-    TheHeader, TheSideBarSmall, TheSidebar, TheSidebarMobile, TheCategories, TheVideos
-  }
-}
+    TheHeader,
+    TheSideBarSmall,
+    TheSidebar,
+    TheSidebarMobile,
+    TheCategories,
+    TheVideos,
+  },
+};
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>
