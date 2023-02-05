@@ -12,7 +12,7 @@
         <BaseIcon name="checkCircle" class="w-3.5 h-3.5 ml-1" />
       </div>
       <div>
-        <span>{{ index }}K views &middot; {{ index }} day ago</span>
+        <span v-html="summary"></span>
       </div>
     </div>
     <button
@@ -28,8 +28,13 @@ import BaseIcon from "./BaseIcon.vue";
 export default {
   name: "VideoItemInfo",
   components: { BaseIcon },
-
   props: ["index"],
+  computed: {
+    summary() {
+      const days = this.index === 1 ? 'day' : 'days'
+      return `${this.index}K views &middot; ${this.index} ${days} ago`
+    }
+  }
 };
 </script>
 
