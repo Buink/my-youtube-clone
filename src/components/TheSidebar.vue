@@ -1,7 +1,5 @@
 <template>
-  <aside
-    class="hidden xl:block w-64 max-h-screen overflow-auto fixed top-0 pt-12 bg-white z-20"
-  >
+  <aside :class="classes">
     <SidebarContent />
   </aside>
 </template>
@@ -13,6 +11,20 @@ export default {
   name: "TheSidebar",
   components: {
     SidebarContent,
+  },
+  computed: {
+    classes() {
+      return [
+        "w-64",
+        "max-h-screen",
+        "overflow-auto",
+        "fixed",
+        "top-0",
+        "pt-12",
+        "bg-white",
+        "z-20",
+      ];
+    },
   },
 };
 </script>

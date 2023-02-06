@@ -8,7 +8,7 @@
 import SidebarNavItem from "./SidebarNavItem.vue";
 export default {
   name: "SidebarSection",
-  components: {SidebarNavItem},
+  components: { SidebarNavItem },
 };
 </script>
 

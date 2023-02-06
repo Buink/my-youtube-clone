@@ -1,7 +1,5 @@
 <template>
-  <a href="#" :class="classes">{{
-    category
-  }}</a>
+  <a href="#" :class="classes">{{ category }}</a>
 </template>
 
 <script>

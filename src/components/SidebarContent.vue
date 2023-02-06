@@ -13,11 +13,11 @@
     </ul>
   </SidebarSection>
   <SidebarSection class="px-8 py-4 font-medium leading-5 border-b">
-      <span class="text-sm">
-        Sign in to like videos, comment, and subscribe.
-      </span>
+    <span class="text-sm">
+      Sign in to like videos, comment, and subscribe.
+    </span>
     <ButtonLogin
-        class="focus:outline-none flex items-center px-2 py-0.5 mt-3 text-sm text-blue-700 uppercase border border-blue-700 rounded-sm"
+      class="focus:outline-none flex items-center px-2 py-0.5 mt-3 text-sm text-blue-700 uppercase border border-blue-700 rounded-sm"
     />
   </SidebarSection>
   <SidebarSection>
@@ -53,7 +53,7 @@
     </ul>
   </SidebarSection>
   <SidebarSection class="px-6 py-4 text-xs font-semibold space-y-4">
-    <TheFooter/>
+    <TheFooter />
   </SidebarSection>
 </template>
 
@@ -76,6 +76,4 @@ export default {
 };
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

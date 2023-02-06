@@ -31,8 +31,8 @@ export default {
         : [...classes, "hover:bg-gray-100"];
     },
     iconClasses() {
-      return this.isActive ? 'w-6 h-6 mr-6 text-red-500' : 'w-6 h-6 mr-6'
-    }
+      return this.isActive ? "w-6 h-6 mr-6 text-red-500" : "w-6 h-6 mr-6";
+    },
   },
 };
 </script>
