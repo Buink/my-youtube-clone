@@ -1,7 +1,7 @@
 <template>
   <div class="relative">
     <BaseTooltip text="Settings">
-      <button @click="isOpen = !isOpen" class="relative p-2 focus:outline-none">
+      <button @click="toggle" class="relative p-2 focus:outline-none">
         <BaseIcon name="dotsVertical" class="w-5 h-5" />
       </button>
     </BaseTooltip>
@@ -17,91 +17,70 @@
       <div
         v-show="isOpen"
         ref="dropdown"
-        @keydown.esc="isOpen = false"
+        @keydown.esc="close"
         tabindex="-1"
         :class="dropdownClasses"
       >
-        <section class="py-2 border-b">
-          <ul>
-            <DropdownSettingsListItem
-              v-for="listItem in listItems"
-              :key="listItem.label"
-              :label="listItem.label"
-              :icon="listItem.icon"
-              :with-sub-menu="listItem.withSubMenu"
-            />
-          </ul>
-        </section>
-        <section class="py-2">
-          <ul>
-            <DropdownSettingsListItem
-              label="Restricted Mode: Off"
-              with-sub-menu
-            />
-          </ul>
-        </section>
+        <component
+          v-if="selectedMenu"
+          :is="menu"
+          :selected-options="selectedOptions"
+          @select-option="selectedOption"
+          @close="closeMenu"
+        />
+        <TheDropdownSettingsMain
+          v-else
+          :menu-items="menuItems"
+          @select-menu="selectMenu"
+        />
       </div>
     </transition>
   </div>
 </template>
 
 <script>
-import DropdownSettingsListItem from "./DropdownSettingsListItem.vue";
 import BaseIcon from "./BaseIcon.vue";
 import BaseTooltip from "./BaseTooltip.vue";
+import TheDropdownSettingsMain from "./TheDropdownSettingsMain.vue";
+import TheDropdownSettingsAppearance from "./TheDropdownSettingsAppearance.vue";
+import TheDropdownSettingsLanguage from "./TheDropdownSettingsLanguage.vue";
+import TheDropdownSettingsLocation from "./TheDropdownSettingsLocation.vue";
+import TheDropdownSettingsRestrictedMode from "./TheDropdownSettingsRestrictedMode.vue";
+import theDropdownSettingsLanguage from "./TheDropdownSettingsLanguage.vue";
 export default {
   name: "TheDropdownSettings",
-  components: { BaseTooltip, BaseIcon, DropdownSettingsListItem },
+  components: {
+    TheDropdownSettingsRestrictedMode,
+    TheDropdownSettingsLocation,
+    TheDropdownSettingsLanguage,
+    TheDropdownSettingsAppearance,
+    TheDropdownSettingsMain,
+    BaseTooltip,
+    BaseIcon,
+  },
   data() {
     return {
       isOpen: false,
-      listItems: [
-        {
-          label: "Appearance: Light",
-          icon: "sun",
-          withSubMenu: true,
+      selectedMenu: null,
+      selectedOptions: {
+        theme: {
+          id: 0,
+          text: "Device theme",
         },
-        {
-          label: "Language: English",
-          icon: "translate",
-          withSubMenu: true,
+        language: {
+          id: 0,
+          text: "English",
         },
-        {
-          label: "Location: Ukraine",
-          icon: "globeAlt",
-          withSubMenu: true,
+        location: {
+          id: 0,
+          text: "United States",
         },
-        {
-          label: "Settings",
-          icon: "cog",
-          withSubMenu: false,
+        restrictedMode: {
+          enabled: false,
+          text: "Off",
         },
-        {
-          label: "Your data in YouTube",
-          icon: "shieldCheck",
-          withSubMenu: false,
-        },
-        {
-          label: "Help",
-          icon: "questionMarkCircle",
-          withSubMenu: false,
-        },
-        {
-          label: "Send feedback",
-          icon: "chatAlt",
-          withSubMenu: false,
-        },
-        {
-          label: "Keyboard shortcuts",
-          icon: "calculator",
-          withSubMenu: false,
-        },
-      ],
-    };
-  },
-  computed: {
-    dropdownClasses() {
-      return [
+      },
+      dropdownClasses: [
         "z-10",
         "opacity-0",
         "group-hover:opacity-100",
@@ -114,19 +93,113 @@ export default {
         "border",
         "border-t-0",
         "focus:outline-none",
+      ],
+    };
+  },
+  computed: {
+    menu() {
+      const menuComponentNames = {
+        appearance: "TheDropdownSettingsAppearance",
+        language: "theDropdownSettingsLanguage",
+        location: "TheDropdownSettingsLocation",
+        restricted_mode: "TheDropdownSettingsRestrictedMode",
+      };
+
+      return this.selectedMenu
+        ? menuComponentNames[this.selectedMenu.id]
+        : null;
+    },
+    menuItems() {
+      return [
+        {
+          id: "appearance",
+          label: "Appearance: " + this.selectedOptions.theme.text,
+          icon: "sun",
+          withSubMenu: true,
+        },
+        {
+          id: "language",
+          label: "Language: " + this.selectedOptions.language.text,
+          icon: "translate",
+          withSubMenu: true,
+        },
+        {
+          id: "location",
+          label: "Location: " + this.selectedOptions.location.text,
+          icon: "globeAlt",
+          withSubMenu: true,
+        },
+        {
+          id: "settings",
+          label: "Settings",
+          icon: "cog",
+          withSubMenu: false,
+        },
+        {
+          id: "your_data_in_youtube",
+          label: "Your data in YouTube",
+          icon: "shieldCheck",
+          withSubMenu: false,
+        },
+        {
+          id: "help",
+          label: "Help",
+          icon: "questionMarkCircle",
+          withSubMenu: false,
+        },
+        {
+          id: "send_feedback",
+          label: "Send feedback",
+          icon: "chatAlt",
+          withSubMenu: false,
+        },
+        {
+          id: "keyboard_shortcuts",
+          label: "Keyboard shortcuts",
+          icon: "calculator",
+          withSubMenu: false,
+        },
+        {
+          id: "restricted_mode",
+          label: "Restricted Mode: " + this.selectedOptions.restrictedMode.text,
+          icon: null,
+          withSubMenu: true,
+        },
       ];
     },
   },
   mounted() {
     window.addEventListener("click", (event) => {
       if (!this.$el.contains(event.target)) {
-        this.isOpen = false;
+        this.close();
       }
     });
   },
   watch: {
     isOpen() {
       this.$nextTick(() => this.isOpen && this.$refs.dropdown.focus());
+    },
+  },
+  methods: {
+    toggle() {
+      this.isOpen ? this.close() : this.open();
+    },
+    open() {
+      this.isOpen = true;
+    },
+    close() {
+      this.isOpen = false;
+      setTimeout(this.closeMenu, 100);
+    },
+    selectMenu(menuItem) {
+      this.selectedMenu = menuItem;
+      this.$refs.dropdown.focus();
+    },
+    closeMenu() {
+      this.selectMenu(null);
+    },
+    selectedOption(option) {
+      this.selectedOptions[option.name] = option.value;
     },
   },
 };

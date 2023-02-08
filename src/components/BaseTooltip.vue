@@ -27,7 +27,17 @@ export default {
   data() {
     return {
       isShown: false,
-      classes: [
+    };
+  },
+  props: {
+    text: String,
+    top: Boolean,
+    right: Boolean,
+    left: Boolean,
+  },
+  computed: {
+    classes() {
+      return [
         "bg-gray-600",
         "bg-opacity-80",
         "rounded-sm",
@@ -37,15 +47,9 @@ export default {
         "p-2",
         "transform",
         "absolute",
-        ...this.getPositionClasses()
-      ],
-    };
-  },
-  props: {
-    text: String,
-    top: Boolean,
-    right: Boolean,
-    left: Boolean,
+        ...this.getPositionClasses(),
+      ];
+    },
   },
   methods: {
     getPositionClasses() {

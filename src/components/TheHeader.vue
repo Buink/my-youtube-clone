@@ -1,12 +1,6 @@
 <template>
   <header :class="classes">
-    <div
-      :class="[
-        'lg:w-1/4',
-        'flex',
-        isMobileSearchShown ? 'opacity-0' : 'opacity-100',
-      ]"
-    >
+    <div :class="leftSideClasses">
       <div class="flex items-center xl:w-64 xl:bg-white pl-4">
         <button
           @click="$emit('toggleSidebar')"
@@ -17,32 +11,18 @@
         <LogoMain />
       </div>
     </div>
-    <TheSearchMobile v-if="isMobileSearchShown" @close="closeMobileSearch" />
-    <div
-      v-else
-      class="hidden sm:flex items-center justify-end p-2.5 pl-8 md:pl-12 md:px-8 flex-1 lg:px-0 lg:w-1/2 max-w-screen-md"
-    >
-      <TheSearch />
+    <TheSearchWrapper
+      v-show="isSearchShown"
+      :is-small-screen="isSmallScreen"
+      @close="closeMobileSearch"
+      @open-voice-modal="isVoiceModalOpen = true"
+    />
+    <div :class="rightSideClasses">
       <BaseTooltip text="Search with your voice">
-        <button class="p-2 focus:outline-none">
-          <BaseIcon name="microphone" class="w-5 h-5" />
-        </button>
-      </BaseTooltip>
-    </div>
-    <div
-      :class="[
-        'flex',
-        'items-center',
-        'justify-end',
-        'lg:w-1/4',
-        'sm:space-x-3',
-        'p-2',
-        'sm:px-4',
-        isMobileSearchShown ? 'opacity-0' : 'opacity-100',
-      ]"
-    >
-      <BaseTooltip text="Search with your voice">
-        <button class="sm:hidden p-2 focus:outline-none">
+        <button
+          class="sm:hidden p-2 focus:outline-none"
+          @click="isVoiceModalOpen = true"
+        >
           <BaseIcon name="microphone" class="w-5 h-5" />
         </button>
       </BaseTooltip>
@@ -59,22 +39,40 @@
       <ButtonLogin />
     </div>
   </header>
+  <teleport to="body">
+    <TheModalSearchWithVoice
+      v-if="isVoiceModalOpen"
+      @close="isVoiceModalOpen = false"
+    />
+  </teleport>
 </template>
 
 <script>
+import { computed } from "vue";
 import TheDropdownApps from "./TheDropdownApps.vue";
 import TheDropdownSettings from "./TheDropdownSettings.vue";
 import LogoMain from "./LogoMain.vue";
-import TheSearch from "./TheSearch.vue";
 import ButtonLogin from "./ButtonLogin.vue";
 import BaseIcon from "./BaseIcon.vue";
 import BaseTooltip from "./BaseTooltip.vue";
-import TheSearchMobile from "./TheSearchMobile.vue";
+import TheSearchWrapper from "./TheSearchWrapper.vue";
+import TheModalSearchWithVoice from "./TheModalSearchWithVoice.vue";
 
 export default {
   name: "TheHeader",
+  components: {
+    TheModalSearchWithVoice,
+    TheSearchWrapper,
+    BaseTooltip,
+    BaseIcon,
+    ButtonLogin,
+    LogoMain,
+    TheDropdownApps,
+    TheDropdownSettings,
+  },
   data() {
     return {
+      isVoiceModalOpen: false,
       isSmallScreen: false,
       isMobileSearchActive: false,
       classes: [
@@ -86,23 +84,39 @@ export default {
       ],
     };
   },
-  components: {
-    TheSearchMobile,
-    BaseTooltip,
-    BaseIcon,
-    ButtonLogin,
-    TheSearch,
-    LogoMain,
-    TheDropdownApps,
-    TheDropdownSettings,
+  emits: {
+    toggleSidebar: null,
+  },
+  provide() {
+    return {
+      isMobileSearchActive: computed(() => this.isMobileSearchActive),
+    };
   },
   computed: {
+    isSearchShown() {
+      return this.isMobileSearchShown || !this.isSmallScreen;
+    },
     isMobileSearchShown() {
       return this.isSmallScreen && this.isMobileSearchActive;
     },
-  },
-  emits: {
-    toggleSidebar: null,
+    leftSideClasses() {
+      return ["lg:w-1/4", "flex", this.opacity];
+    },
+    rightSideClasses() {
+      return [
+        "flex",
+        "items-center",
+        "justify-end",
+        "lg:w-1/4",
+        "sm:space-x-3",
+        "p-2",
+        "sm:px-4",
+        this.opacity,
+      ];
+    },
+    opacity() {
+      return this.isMobileSearchShown ? "opacity-0" : "opacity-100";
+    },
   },
   mounted() {
     this.onResize();
